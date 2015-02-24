@@ -1,4 +1,5 @@
 #include "mips_memory.h"
+#include "utils.h"
 
 #pragma once
 

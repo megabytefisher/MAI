@@ -1,6 +1,7 @@
 #include "mips_memory.h"
 #include "mips_instructions.h"
 #include <string.h>
+#include "utils.h"
 
 #pragma once
 

@@ -1,27 +1,5 @@
 #include "mips_interpreter.h"
 
-// used to skip whitespace characters.
-// returns a modified character pointer from the input
-char* skip_over_whitespace(char* input)
-{
-    while (*input == ' ' || *input == '\t' || *input == '\n')
-    {
-        input++;
-    }
-    return input;
-}
-
-// used to skip over non-whitespace characters
-// basically the opposite of skip_over_whitespace
-char* skip_to_whitespace(char* input)
-{
-    while (*input != ' ' && *input != '\t' && *input != '\n')
-    {
-        input++;
-    }
-    return input;
-}
-
 // runs through all MIPS commands inside a string
 void run_from_string(mips_state* registers, char* input)
 {
@@ -46,7 +24,7 @@ void run_from_string(mips_state* registers, char* input)
                 // look up the function in the implementation array
                 instruction_function opcode_func = INSTRUCTION_IMPLEMENTATION[i];
                 // call that bad boy
-                opcode_func(registers, input);
+                opcode_func(registers, input + instruction_name_length);
             }
         }
         

@@ -38,7 +38,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/mips_instructions.o \
 	${OBJECTDIR}/mips_interpreter.o \
-	${OBJECTDIR}/mips_memory.o
+	${OBJECTDIR}/mips_memory.o \
+	${OBJECTDIR}/utils.o
 
 
 # C Compiler Flags
@@ -84,6 +85,11 @@ ${OBJECTDIR}/mips_memory.o: mips_memory.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mips_memory.o mips_memory.c
+
+${OBJECTDIR}/utils.o: utils.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utils.o utils.c
 
 # Subprojects
 .build-subprojects:
