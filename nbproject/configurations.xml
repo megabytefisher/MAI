@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>mips_instructions.h</itemPath>
       <itemPath>mips_interpreter.h</itemPath>
       <itemPath>mips_memory.h</itemPath>
     </logicalFolder>
@@ -15,6 +16,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
+      <itemPath>mips_instructions.c</itemPath>
       <itemPath>mips_interpreter.c</itemPath>
       <itemPath>mips_memory.c</itemPath>
     </logicalFolder>
@@ -41,6 +43,10 @@
       <compileType>
       </compileType>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="mips_instructions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="mips_instructions.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mips_interpreter.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -72,6 +78,10 @@
         </asmTool>
       </compileType>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="mips_instructions.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="mips_instructions.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mips_interpreter.c" ex="false" tool="0" flavor2="0">
       </item>

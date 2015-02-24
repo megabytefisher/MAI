@@ -9,7 +9,7 @@
  */
 int main(int argc, char** argv) {
     // create the MIPS register space, and set all registers to zero
-    mips_registers registers = { 0 };
+    mips_state registers = { 0 };
     // create space for the MIPS stack
     initialize_stack(&registers);
     

@@ -1,3 +1,7 @@
+#include "mips_memory.h"
+#include "mips_instructions.h"
+#include <string.h>
 
+#pragma once
 
-void run_from_string(char* input);
+void run_from_string(mips_state*, char*);

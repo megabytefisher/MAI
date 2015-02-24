@@ -1,6 +1,8 @@
 // mips_memory.h
 //
 
+#pragma once
+
 typedef struct {
     int zero;
     int at;
@@ -36,7 +38,9 @@ typedef struct {
     int ra;
     
     void* stackBottom;
-} mips_registers;
+} mips_state;
 
-void initialize_stack(mips_registers *registers);
-void destroy_stack(mips_registers *registers);
+
+void initialize_stack(mips_state *registers);
+void destroy_stack(mips_state *registers);
+int* get_register_ptr(mips_state *state, char* registerName);

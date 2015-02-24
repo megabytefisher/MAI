@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/mips_instructions.o \
 	${OBJECTDIR}/mips_interpreter.o \
 	${OBJECTDIR}/mips_memory.o
 
@@ -68,6 +69,11 @@ ${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+
+${OBJECTDIR}/mips_instructions.o: mips_instructions.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mips_instructions.o mips_instructions.c
 
 ${OBJECTDIR}/mips_interpreter.o: mips_interpreter.c 
 	${MKDIR} -p ${OBJECTDIR}
