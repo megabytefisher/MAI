@@ -36,10 +36,22 @@ void run_from_string(mips_state* registers, char* input)
         
         // first we check if its an opcode.
         // we do this by scanning through the array of stored instruction names, and memcmping the current text
-        for (int i = 0; i < (sizeof(INSTRUCTION_NAMES) / sizeof(INSTRUCTION_NAMES[0])); i++)
+        for (int i = 0; i < INSTRUCTION_COUNT; i++)
         {
-            int instruction_name_string = strlen(&INSTRUCTION_NAMES[0]);
-            
+            int instruction_name_length = strlen(INSTRUCTION_NAMES[0]);
+            if (memcmp(INSTRUCTION_NAMES[0], input, instruction_name_length) == 0)
+            {
+                // we got a match!
+                
+                // look up the function in the implementation array
+                instruction_function opcode_func = INSTRUCTION_IMPLEMENTATION[i];
+                // call that bad boy
+                opcode_func(registers, input);
+            }
         }
+        
+        // we didn't find any matching opcode name. maybe it's a section specifier?
+        
+        break;
     }
 }
