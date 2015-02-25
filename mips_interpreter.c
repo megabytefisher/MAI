@@ -16,9 +16,14 @@ void run_from_string(mips_state* registers, char* input)
         // we do this by scanning through the array of stored instruction names, and memcmping the current text
         for (int i = 0; i < INSTRUCTION_COUNT; i++)
         {
-            int instruction_name_length = strlen(INSTRUCTION_NAMES[0]);
-            if (memcmp(INSTRUCTION_NAMES[0], input, instruction_name_length) == 0)
+            int instruction_name_length = strlen(INSTRUCTION_NAMES[i]);
+            if (memcmp(INSTRUCTION_NAMES[i], input, instruction_name_length) == 0)
             {
+                // make sure there is at least one character of whitespace after the command.
+                // if we don't check this, we might get false positives- add will trigger addi, etc..
+                if (!is_whitespace(input + instruction_name_length))
+                    continue;
+                
                 // we got a match!
                 
                 // look up the function in the implementation array
