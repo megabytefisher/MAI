@@ -31,3 +31,4 @@
 # Build directory
 /build/
 /dist/
+/nbproject/private/
