@@ -2,9 +2,25 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "add", "addi" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi };
-const int INSTRUCTION_COUNT = 2;
+const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi };
+const int INSTRUCTION_COUNT = 4;
+
+typedef struct {
+    int* destination_register;
+    int* source_register_a;
+    int* source_register_b;
+    
+    char* destination_register_string;
+} r_instruction_data;
+
+typedef struct {
+    int* destination_register;
+    int* source_register;
+    int immediate_value;
+    
+    char* destination_register_string;
+} i_instruction_data;
 
 // utility function for printing whichever register was modified
 void print_modified_register(mips_state* state, char* register_string)
@@ -19,9 +35,10 @@ void print_modified_register(mips_state* state, char* register_string)
     printf(" : %d\n", *register_value);
 }
 
-// implementation for the standard add instruction
-void add(mips_state* state, char* parameters)
-{
+r_instruction_data* parse_r_instruction(r_instruction_data* data, mips_state* state, char* parameters) {
+    if (data == NULL)
+        return NULL;
+    
     // skip white space
     parameters = skip_over_whitespace(parameters);
     
@@ -33,12 +50,12 @@ void add(mips_state* state, char* parameters)
     if (destination_register == NULL)
     {
         printf("Error - destination is not a valid register!\n");
-        return;
+        return NULL;
     }
     if (destination_register == &state->zero)
     {
         printf("Error - you can't specify the $zero register as a destination!\n");
-        return;
+        return NULL;
     }
     
     // skip over the current identifier plus the whitespace after it
@@ -49,7 +66,7 @@ void add(mips_state* state, char* parameters)
     if (source_register_a == NULL)
     {
         printf("Error - first source is not a valid register!\n");
-        return;
+        return NULL;
     }
     
     // skip over the current identifier plus the whitespace after it
@@ -60,18 +77,22 @@ void add(mips_state* state, char* parameters)
     if (source_register_b == NULL)
     {
         printf("Error - second source is not a valid register!\n");
-        return;
+        return NULL;
     }
     
-    // add sources to destination
-    *destination_register = *source_register_a + *source_register_b;
+    data->destination_register = destination_register;
+    data->source_register_a = source_register_a;
+    data->source_register_b = source_register_b;
+    data->destination_register_string = destination_string;
     
-    // display modified register
-    print_modified_register(state, destination_string);
+    return data;
 }
 
-void addi(mips_state* state, char* parameters)
+i_instruction_data* parse_i_instruction(i_instruction_data* data, mips_state* state, char* parameters)
 {
+    if (data == NULL)
+        return NULL;
+    
     // skip white space
     parameters = skip_over_whitespace(parameters);
     
@@ -83,11 +104,12 @@ void addi(mips_state* state, char* parameters)
     if (destination_register == NULL)
     {
         printf("Error - destination is not a valid register!\n");
-        return;
+        return NULL;
     }
     if (destination_register == &state->zero)
     {
         printf("Error - you can't specify the $zero register as a destination!\n");
+        return NULL;
     }
     
     // skip over the current identifier plus the whitespace after it
@@ -98,7 +120,7 @@ void addi(mips_state* state, char* parameters)
     if (source_register_a == NULL)
     {
         printf("Error - first source is not a valid register!\n");
-        return;
+        return NULL;
     }
     
     // skip over the current identifier plus the whitespace after it
@@ -108,7 +130,7 @@ void addi(mips_state* state, char* parameters)
     if (*parameters == '$')
     {
         printf("Error - the third operand must be an immediate value, not a register!\n");
-        return;
+        return NULL;
     }
     
     // TODO : maybe the value is a label?
@@ -116,9 +138,84 @@ void addi(mips_state* state, char* parameters)
     // read the value as an integer
     int immediate_value = atoi(parameters);
     
+    data->destination_register = destination_register;
+    data->source_register = source_register_a;
+    data->destination_register_string = destination_string;
+    data->immediate_value = immediate_value;
+    
+    return data;
+}
+
+
+
+// implementation for the standard add instruction
+void add(mips_state* state, char* parameters)
+{
+    r_instruction_data instruction_data;
+    r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
     // add sources to destination
-    *destination_register = *source_register_a + immediate_value;
+    *parse_result->destination_register =
+            *parse_result->source_register_a +
+            *parse_result->source_register_b;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void addi(mips_state* state, char* parameters)
+{
+    i_instruction_data instruction_data;
+    i_instruction_data* parse_result = parse_i_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // add sources to destination
+    *parse_result->destination_register =
+            *parse_result->source_register +
+            parse_result->immediate_value;
     
     // print modified destination
-    print_modified_register(state, destination_string);
+    print_modified_register(state, parse_result->destination_register_string);
 }
+
+void and(mips_state* state, char* parameters) {
+    r_instruction_data instruction_data;
+    r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // AND sources to destination
+    *parse_result->destination_register =
+            *parse_result->source_register_a &
+            *parse_result->source_register_b;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void andi(mips_state* state, char* parameters) {
+    i_instruction_data instruction_data;
+    i_instruction_data* parse_result = parse_i_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // AND sources to destination
+    *parse_result->destination_register =
+            *parse_result->source_register &
+            parse_result->immediate_value;
+    
+    // print modified destination
+    print_modified_register(state, parse_result->destination_register_string);
+}
+

@@ -5,9 +5,6 @@
 #include "mips_memory.h"
 #include "mips_interpreter.h"
 
-/*
- * 
- */
 int main(int argc, char** argv) {
     // create the MIPS register space, and set all registers to zero
     mips_state registers = { 0 };

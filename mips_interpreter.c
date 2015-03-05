@@ -4,7 +4,7 @@
 void run_from_string(mips_state* registers, char* input)
 {
     // infinite loop- until we run out of commands to process.
-    while (1)
+    while (input != NULL)
     {
         // first, skip all whitespace before the next command
         input = skip_over_whitespace(input);
@@ -28,13 +28,14 @@ void run_from_string(mips_state* registers, char* input)
                 
                 // look up the function in the implementation array
                 instruction_function opcode_func = INSTRUCTION_IMPLEMENTATION[i];
+                // skip over the instruction name
+                input += instruction_name_length;
                 // call that bad boy
-                opcode_func(registers, input + instruction_name_length);
+                opcode_func(registers, input);
             }
         }
         
         // we didn't find any matching opcode name. maybe it's a section specifier?
-        
         break;
     }
 }

@@ -9,6 +9,8 @@ typedef void (*instruction_function)(mips_state*, char*);
 // instruction implementations
 void add(mips_state*, char*);
 void addi(mips_state*, char*);
+void and(mips_state*, char*);
+void andi(mips_state*, char*);
 
 // pseudo-dictionary for going from char* -> function pointer
 extern const char* INSTRUCTION_NAMES[];
