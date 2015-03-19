@@ -16,6 +16,8 @@ void subi(mips_state*, char*);
 void or(mips_state*, char*);
 void ori(mips_state*, char*);
 void xor(mips_state*, char*);
+void sll(mips_state*, char*);
+void slr(mips_state*, char*);
 
 
 // pseudo-dictionary for going from char* -> function pointer

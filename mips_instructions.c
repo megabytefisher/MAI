@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor"};
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi,&sub,&subi,&or,&ori,&xor};
-const int INSTRUCTION_COUNT = 9;
+const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sll", "slr"};
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi,&sub,&subi,&or,&ori,&xor, &sll, &slr};
+const int INSTRUCTION_COUNT = 11;
 
 typedef struct {
     int* destination_register;
@@ -312,6 +312,38 @@ void xor(mips_state* state, char* parameters) {
     // XOR sources to destination
     *parse_result->destination_register =
             *parse_result->source_register_a ^
+            *parse_result->source_register_b;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void sll(mips_state* state, char* parameters) {
+    r_instruction_data instruction_data;
+    r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    *parse_result->destination_register =
+            *parse_result->source_register_a <<
+            *parse_result->source_register_b;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void slr(mips_state* state, char* parameters) {
+    r_instruction_data instruction_data;
+    r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    *parse_result->destination_register =
+            *parse_result->source_register_a >>
             *parse_result->source_register_b;
     
     // display modified register
