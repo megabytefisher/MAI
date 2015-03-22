@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sllv", "slrv" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi, &sub, &subi, &or, &ori, &xor, &sllv, &slrv};
+const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sllv", "slrv" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &subi, &or, &ori, &xor, &sllv, &slrv};
 const int INSTRUCTION_COUNT = 11;
 
 typedef struct {
@@ -146,7 +146,10 @@ i_instruction_data* parse_i_instruction(i_instruction_data* data, mips_state* st
     return data;
 }
 
-
+void help(mips_state* state, char* parameters)
+{
+    printf("MIPS is a real-time MIPS interpreter.\nYou can enter MIPS assembly instruction and watch them execute one line at a time.\nFor example, try typing..\n\t>> addi $s0, $s0, 5\n\t>> add $s0, $s0, $s0\n");
+}
 
 // implementation for the standard add instruction
 void add(mips_state* state, char* parameters)

@@ -7,6 +7,7 @@
 typedef void (*instruction_function)(mips_state*, char*);
 
 // instruction implementations
+void help(mips_state*, char*);
 void add(mips_state*, char*);
 void addi(mips_state*, char*);
 void and(mips_state*, char*);
