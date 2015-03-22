@@ -13,7 +13,6 @@ void addi(mips_state*, char*);
 void and(mips_state*, char*);
 void andi(mips_state*, char*);
 void sub(mips_state*, char*);
-void subi(mips_state*, char*);
 void or(mips_state*, char*);
 void ori(mips_state*, char*);
 void xor(mips_state*, char*);

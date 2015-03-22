@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sllv", "slrv" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &subi, &or, &ori, &xor, &sllv, &slrv};
-const int INSTRUCTION_COUNT = 12;
+const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv};
+const int INSTRUCTION_COUNT = 11;
 
 typedef struct {
     int* destination_register;
@@ -240,26 +240,6 @@ void sub(mips_state* state, char* parameters)
     // display modified register
     print_modified_register(state, parse_result->destination_register_string);
 }
-
-
-void subi(mips_state* state, char* parameters)
-{
-    i_instruction_data instruction_data;
-    i_instruction_data* parse_result = parse_i_instruction(&instruction_data, state, parameters);
-    if (parse_result == NULL)
-    {
-        return;
-    }
-    
-    // sub immediate sources to destination
-    *parse_result->destination_register =
-            *parse_result->source_register -
-            parse_result->immediate_value;
-    
-    // print modified destination
-    print_modified_register(state, parse_result->destination_register_string);
-}
-
 
 void or(mips_state* state, char* parameters) {
     r_instruction_data instruction_data;
