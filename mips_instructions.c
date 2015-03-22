@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sll", "slr"};
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi,&sub,&subi,&or,&ori,&xor, &sll, &slr};
+const char* INSTRUCTION_NAMES[] = { "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sllv", "slrv" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &add, &addi, &and, &andi, &sub, &subi, &or, &ori, &xor, &sllv, &slrv};
 const int INSTRUCTION_COUNT = 11;
 
 typedef struct {
@@ -220,9 +220,6 @@ void andi(mips_state* state, char* parameters) {
     print_modified_register(state, parse_result->destination_register_string);
 }
 
-
-
-
 void sub(mips_state* state, char* parameters)
 {
     r_instruction_data instruction_data;
@@ -318,7 +315,7 @@ void xor(mips_state* state, char* parameters) {
     print_modified_register(state, parse_result->destination_register_string);
 }
 
-void sll(mips_state* state, char* parameters) {
+void sllv(mips_state* state, char* parameters) {
     r_instruction_data instruction_data;
     r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
     if (parse_result == NULL)
@@ -334,7 +331,7 @@ void sll(mips_state* state, char* parameters) {
     print_modified_register(state, parse_result->destination_register_string);
 }
 
-void slr(mips_state* state, char* parameters) {
+void slrv(mips_state* state, char* parameters) {
     r_instruction_data instruction_data;
     r_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
     if (parse_result == NULL)

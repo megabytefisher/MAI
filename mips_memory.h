@@ -37,6 +37,9 @@ typedef struct {
     int fp;
     int ra;
     
+    int hi;
+    int lo;
+    
     void* stackBottom;
 } mips_state;
 
