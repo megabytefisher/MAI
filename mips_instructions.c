@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv};
-const int INSTRUCTION_COUNT = 11;
+const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv", "noop" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &noop };
+const int INSTRUCTION_COUNT = 12;
 
 typedef struct {
     int* destination_register;
@@ -328,4 +328,8 @@ void slrv(mips_state* state, char* parameters) {
     
     // display modified register
     print_modified_register(state, parse_result->destination_register_string);
+}
+
+void noop(mips_state* state, char* parameters) {
+    // do nothing, best instruction
 }

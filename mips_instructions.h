@@ -18,6 +18,7 @@ void ori(mips_state*, char*);
 void xor(mips_state*, char*);
 void sllv(mips_state*, char*);
 void slrv(mips_state*, char*);
+void noop(mips_state*, char*);
 
 
 // pseudo-dictionary for going from char* -> function pointer
