@@ -4,7 +4,7 @@
 
 const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","sub","subi","or", "ori" , "xor", "sllv", "slrv" };
 const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &subi, &or, &ori, &xor, &sllv, &slrv};
-const int INSTRUCTION_COUNT = 11;
+const int INSTRUCTION_COUNT = 12;
 
 typedef struct {
     int* destination_register;
