@@ -19,6 +19,10 @@ void xor(mips_state*, char*);
 void sllv(mips_state*, char*);
 void slrv(mips_state*, char*);
 void noop(mips_state*, char*);
+void div(mips_state*, char*);
+void mult(mips_state*, char*);
+void mflo(mips_state*, char*);
+void mfhi(mips_state*, char*);
 
 
 // pseudo-dictionary for going from char* -> function pointer

@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv", "noop" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &noop };
-const int INSTRUCTION_COUNT = 12;
+const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &div, &mult, &noop, &mflo, &mfhi};
+const int INSTRUCTION_COUNT = 16;
 
 typedef struct {
     int* destination_register;
@@ -13,6 +13,18 @@ typedef struct {
     
     char* destination_register_string;
 } r_instruction_data;
+
+typedef struct {
+    int* destination_register;
+    
+    char* destination_register_string;
+} sr_instruction_data;
+
+typedef struct {
+    int* source_register_a;
+    int* source_register_b;
+    char* destination_register_string;
+} dr_instruction_data;
 
 typedef struct {
     int* destination_register;
@@ -33,6 +45,24 @@ void print_modified_register(mips_state* state, char* register_string)
     printf("Modified register:\n\t");
     fwrite(register_string, 1, 3, stdout);
     printf(" : %d\n", *register_value);
+}
+
+void print_lo_register(mips_state* state)
+{
+    // the length of the register should always be 3 - because
+    // $zero should never be modified
+    
+    printf("Modified register:\n\tlo");
+    printf(" : %d\n", state->lo);
+}
+
+void print_hi_register(mips_state* state)
+{
+    // the length of the register should always be 3 - because
+    // $zero should never be modified
+    
+    printf("Modified register:\n\thi");
+    printf(" : %d\n", state->hi);
 }
 
 r_instruction_data* parse_r_instruction(r_instruction_data* data, mips_state* state, char* parameters) {
@@ -84,6 +114,67 @@ r_instruction_data* parse_r_instruction(r_instruction_data* data, mips_state* st
     data->source_register_a = source_register_a;
     data->source_register_b = source_register_b;
     data->destination_register_string = destination_string;
+    
+    return data;
+}
+
+sr_instruction_data* parse_sr_instruction(sr_instruction_data* data, mips_state* state, char* parameters) {
+    if (data == NULL)
+        return NULL;
+    
+    // skip white space
+    parameters = skip_over_whitespace(parameters);
+    
+    // save this location in the string
+    char* destination_string = parameters;
+    
+    // get the destination register
+    int* destination_register = get_register_ptr(state, parameters);
+    if (destination_register == NULL)
+    {
+        printf("Error - destination is not a valid register!\n");
+        return NULL;
+    }
+    if (destination_register == &state->zero)
+    {
+        printf("Error - you can't specify the $zero register as a destination!\n");
+        return NULL;
+    }
+    
+    data->destination_register = destination_register;
+    data->destination_register_string = destination_string;
+    
+    return data;
+}
+
+dr_instruction_data* parse_dr_instruction(dr_instruction_data* data, mips_state* state, char* parameters) {
+    if (data == NULL)
+        return NULL;
+    
+    // skip white space
+    parameters = skip_over_whitespace(parameters);
+    
+    // get source register
+    int* source_register_a = get_register_ptr(state, parameters);
+    if (source_register_a == NULL)
+    {
+        printf("Error - first source is not a valid register!\n");
+        return NULL;
+    }
+    
+    // skip over the current identifier plus the whitespace after it
+    parameters = skip_over_whitespace(skip_to_whitespace(parameters));
+    
+    // get source register
+    int* source_register_b = get_register_ptr(state, parameters);
+    if (source_register_b == NULL)
+    {
+        printf("Error - first source is not a valid register!\n");
+        return NULL;
+    }
+    
+    data->source_register_a = source_register_a;
+    data->source_register_b = source_register_b;
     
     return data;
 }
@@ -145,6 +236,8 @@ i_instruction_data* parse_i_instruction(i_instruction_data* data, mips_state* st
     
     return data;
 }
+
+
 
 void help(mips_state* state, char* parameters)
 {
@@ -330,6 +423,85 @@ void slrv(mips_state* state, char* parameters) {
     print_modified_register(state, parse_result->destination_register_string);
 }
 
+void div(mips_state* state, char* parameters) {
+    dr_instruction_data instruction_data;
+    dr_instruction_data* parse_result = parse_dr_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    state->lo =
+            *parse_result->source_register_a /
+            *parse_result->source_register_b;
+    
+    state->hi = 
+            *parse_result->source_register_a %
+            *parse_result->source_register_b;
+    
+    // display modified register
+    print_lo_register(state);
+    print_hi_register(state);
+}
+
+void mult(mips_state* state, char* parameters){
+    
+     dr_instruction_data instruction_data;
+    dr_instruction_data* parse_result = parse_dr_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    long result;
+    result=
+             *parse_result->source_register_a *
+            *parse_result->source_register_b;
+    
+    state->lo =
+            0xFFFFFFFF &
+            result;
+    
+    state->hi=
+            result>>
+            32;
+    
+    
+    // display modified register
+    print_lo_register(state);
+    print_hi_register(state);
+    
+}
+
 void noop(mips_state* state, char* parameters) {
     // do nothing, best instruction
+}
+
+void mflo(mips_state* state, char* parameters) {
+    sr_instruction_data instruction_data;
+    sr_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    *parse_result->destination_register = 
+            state->lo;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void mfhi(mips_state* state, char* parameters) {
+    sr_instruction_data instruction_data;
+    sr_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    *parse_result->destination_register = 
+            state->hi;
+    
+    // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
 }
