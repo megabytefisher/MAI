@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &div, &mult, &noop, &mflo, &mfhi};
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi};
 const int INSTRUCTION_COUNT = 16;
 
 typedef struct {
@@ -423,7 +423,7 @@ void slrv(mips_state* state, char* parameters) {
     print_modified_register(state, parse_result->destination_register_string);
 }
 
-void div(mips_state* state, char* parameters) {
+void divi(mips_state* state, char* parameters) {
     dr_instruction_data instruction_data;
     dr_instruction_data* parse_result = parse_dr_instruction(&instruction_data, state, parameters);
     if (parse_result == NULL)
