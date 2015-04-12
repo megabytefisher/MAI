@@ -6,6 +6,8 @@ const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "and
 const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li};
 const int INSTRUCTION_COUNT = 18;
 
+char* LABEL_INFORMATION[5][2];
+
 typedef struct {
     int* destination_register;
     int* source_register_a;

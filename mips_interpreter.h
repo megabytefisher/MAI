@@ -6,3 +6,4 @@
 #pragma once
 
 void run_from_string(mips_state*, char*);
+void run_from_data(char*);

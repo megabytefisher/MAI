@@ -5,6 +5,7 @@
 
 // function pointer to a mips instruction implementation
 typedef void (*instruction_function)(mips_state*, char*);
+typedef void (*data_function)(char*);
 
 // instruction implementations
 void help(mips_state*, char*);
