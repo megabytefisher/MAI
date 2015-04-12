@@ -1,10 +1,10 @@
 #include "mips_instructions.h"
-
+#include <stdlib.h>
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = { "help", "add", "addi", "and", "andi","subi","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = { &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi};
-const int INSTRUCTION_COUNT = 16;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li};
+const int INSTRUCTION_COUNT = 18;
 
 typedef struct {
     int* destination_register;
@@ -26,6 +26,15 @@ typedef struct {
     char* destination_register_string;
 } dr_instruction_data;
 
+
+typedef struct {
+    int* destination_register;
+    int immediate_value;
+    
+    char* destination_register_string;
+} dri_instruction_data;
+
+
 typedef struct {
     int* destination_register;
     int* source_register;
@@ -33,6 +42,53 @@ typedef struct {
     
     char* destination_register_string;
 } i_instruction_data;
+
+void syscall(mips_state* state, char* parameters)
+{
+    // the length of the register should always be 3 - because
+    // $zero should never be modified
+      int printa0= state->a0;
+    switch(state->v0){
+        
+        case 1:
+            printf("Printing register a0\n");
+            printf("%d\n", printa0);
+                break;
+        case 2:
+                break; 
+        case 3:
+                break; 
+        case 4:
+                break;
+            
+        case 5:
+            
+            printf("Please enter value to store in $v0:");
+            int n;
+            scanf("%d", &n);
+            state->v0=n;
+             printf("Modified register:\n\t$v0");
+             printf(" : %d\n", state->v0);
+            break;
+            
+        case 10:
+            printf("MAI program ending. Goodbye.");
+            exit(0);
+            break;
+            
+        case 12:
+           
+            printf("Please enter a character to store in $v0:");
+            state->v0= getchar();
+            printf("Modified register:\n\t$v0:");
+            putchar(state->v0);
+            printf("\n");
+            break;
+    
+    }
+ 
+   
+}
 
 // utility function for printing whichever register was modified
 void print_modified_register(mips_state* state, char* register_string)
@@ -238,6 +294,52 @@ i_instruction_data* parse_i_instruction(i_instruction_data* data, mips_state* st
 }
 
 
+dri_instruction_data* parse_dri_instruction(dri_instruction_data* data, mips_state* state, char* parameters)
+{
+    if (data == NULL)
+        return NULL;
+    
+    // skip white space
+    parameters = skip_over_whitespace(parameters);
+    
+    // save this location in the string
+    char* destination_string = parameters;
+    
+    // get the destination register
+    int* destination_register = get_register_ptr(state, parameters);
+    if (destination_register == NULL)
+    {
+        printf("Error - destination is not a valid register!\n");
+        return NULL;
+    }
+    if (destination_register == &state->zero)
+    {
+        printf("Error - you can't specify the $zero register as a destination!\n");
+        return NULL;
+    }
+    
+    // skip over the current identifier plus the whitespace after it
+    parameters = skip_over_whitespace(skip_to_whitespace(parameters));
+    
+    
+    // make sure this source isn't a register- it must be an immediate!
+    if (*parameters == '$')
+    {
+        printf("Error - the third operand must be an immediate value, not a register!\n");
+        return NULL;
+    }
+    
+    // TODO : maybe the value is a label?
+    
+    // read the value as an integer
+    int immediate_value = atoi(parameters);
+    
+    data->destination_register = destination_register;
+    data->destination_register_string = destination_string;
+    data->immediate_value = immediate_value;
+    
+    return data;
+}
 
 void help(mips_state* state, char* parameters)
 {
@@ -503,5 +605,22 @@ void mfhi(mips_state* state, char* parameters) {
             state->hi;
     
     // display modified register
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void li(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // add sources to destination
+    *parse_result->destination_register =
+            parse_result->immediate_value;
+    
+    // print modified destination
     print_modified_register(state, parse_result->destination_register_string);
 }

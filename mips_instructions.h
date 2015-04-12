@@ -23,6 +23,8 @@ void divi(mips_state*, char*); // div command, but cannot be named div due to co
 void mult(mips_state*, char*);
 void mflo(mips_state*, char*);
 void mfhi(mips_state*, char*);
+void li(mips_state*, char*);
+void syscall(mips_state*, char*);
 
 
 // pseudo-dictionary for going from char* -> function pointer
