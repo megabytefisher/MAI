@@ -3,7 +3,7 @@
 // checks if the specified character is whitespace
 int is_whitespace(char* input)
 {
-    if (*input == ' ' || *input == '\t' || *input == '\n' || *input == ',')
+    if (*input == ' ' || *input == '\t' || *input == '\n' || *input == ',' || *input == ':')
     {
         return 1;
     }
