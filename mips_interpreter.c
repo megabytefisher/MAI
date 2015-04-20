@@ -173,6 +173,9 @@ void run_from_string(mips_state* registers, char* input)
             return;
         }
         
+        if (save_to_memory)
+            // increment pc by 4
+            registers->pc += 4;
 
         // skip over the instruction name
         char* input_args = input + instruction_name_length;
@@ -183,8 +186,6 @@ void run_from_string(mips_state* registers, char* input)
         // save instruction text
         if (save_to_memory)
         {
-            // increment pc by 4
-            registers->pc += 4;
             save_to_text(registers, label_name, input);
         }
     }
@@ -202,12 +203,13 @@ void run_from_pc(mips_state* state)
     // got the starting node.. now just run from it.
     while (state->pc != state->instruction_counter)
     {
+        printf("%d>> %s\n", state->pc, node->instruction);
+        
         // increment pc by 4
         state->pc += 4;
         
         int instruction_name_length;
         instruction_function c_func = get_instruction_function(node->instruction, &instruction_name_length);
-        
         c_func(state, (node->instruction) + instruction_name_length);
         
         // move to next node*/

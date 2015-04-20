@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j};
-const int INSTRUCTION_COUNT = 20;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j", "beq" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j, &beq};
+const int INSTRUCTION_COUNT = 21;
 
 typedef struct {
     int* destination_register;
@@ -738,4 +738,39 @@ void j(mips_state* state, char* parameters)
     state->pc = parse_result->immediate_value;
     
     printf("Modified register:\n\tpc : %d\n", state->pc);
+}
+
+void jal(mips_state* state, char* parameters)
+{
+    si_instruction_data instruction_data;
+    si_instruction_data* parse_result = parse_si_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // save pc (already +4) to ra
+    state->ra = state->pc;
+    // jump to immediate value
+    state->pc = parse_result->immediate_value;
+    
+    printf("Modified register:\n\tpc : %d\n", state->pc);
+}
+
+void beq(mips_state* state, char* parameters)
+{
+    i_instruction_data instruction_data;
+    i_instruction_data* parse_result = parse_i_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->source_register == *parse_result->destination_register)
+    {
+        // they are equal, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
 }
