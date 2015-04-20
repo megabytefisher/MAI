@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j", "beq" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j, &beq};
-const int INSTRUCTION_COUNT = 21;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne };
+const int INSTRUCTION_COUNT = 28;
 
 typedef struct {
     int* destination_register;
@@ -769,6 +769,129 @@ void beq(mips_state* state, char* parameters)
     if (*parse_result->source_register == *parse_result->destination_register)
     {
         // they are equal, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bgez(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register >= 0)
+    {
+        // greater or equal to 0, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bgezal(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register >= 0)
+    {
+        // save return address
+        state->ra = state->pc;
+        // greater or equal to 0, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bgtz(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register > 0)
+    {
+        // greater than 0, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void blez(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register <= 0)
+    {
+        // less than or equal to 0, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bltz(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register < 0)
+    {
+        // less than zero, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bltzal(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register < 0)
+    {
+        // save return address
+        state->ra = state->pc;
+        // less than 0, now jump
+        state->pc = parse_result->immediate_value;
+        
+        printf("Modified register:\n\tpc : %d\n", state->pc);
+    }
+}
+
+void bne(mips_state* state, char* parameters)
+{
+    i_instruction_data instruction_data;
+    i_instruction_data* parse_result = parse_i_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    if (*parse_result->destination_register != *parse_result->source_register)
+    {
+        // they are not equal, now jump
         state->pc = parse_result->immediate_value;
         
         printf("Modified register:\n\tpc : %d\n", state->pc);

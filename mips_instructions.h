@@ -29,6 +29,13 @@ void syscall(mips_state*, char*);
 void jr(mips_state* state, char* parameters);
 void j(mips_state* state, char* parameters);
 void beq(mips_state* state, char* parameters);
+void bgez(mips_state* state, char* parameters);
+void bgezal(mips_state* state, char* parameters);
+void bgtz(mips_state* state, char* parameters);
+void blez(mips_state* state, char* parameters);
+void bltz(mips_state* state, char* parameters);
+void bltzal(mips_state* state, char* parameters);
+void bne(mips_state* state, char* parameters);
 
 // pseudo-dictionary for going from char* -> function pointer
 extern const char* INSTRUCTION_NAMES[];
