@@ -3,6 +3,23 @@
 
 #pragma once
 
+// linked list containing each data entry part
+typedef struct data_entry_ {
+    char name[56];
+    char type[56];
+    char data[56];
+    
+    struct data_entry_* next;
+} data_entry;
+
+// linked list containing each text entry part
+typedef struct text_entry_ {
+    char label[56];
+    char instruction[56];
+    
+    struct text_entry_* next;
+} text_entry;
+
 typedef struct {
     int zero;
     int at;
@@ -37,10 +54,15 @@ typedef struct {
     int fp;
     int ra;
     
+    int pc;
     int hi;
     int lo;
     
     void* stackBottom;
+    
+    int instruction_counter;
+    data_entry* data_section;
+    text_entry* text_section;
 } mips_state;
 
 

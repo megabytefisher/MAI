@@ -26,6 +26,7 @@ void mflo(mips_state*, char*);
 void mfhi(mips_state*, char*);
 void li(mips_state*, char*);
 void syscall(mips_state*, char*);
+void jr(mips_state* state, char* parameters);
 
 
 // pseudo-dictionary for going from char* -> function pointer

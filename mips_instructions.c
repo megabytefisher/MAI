@@ -2,11 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li};
-const int INSTRUCTION_COUNT = 18;
-
-char* LABEL_INFORMATION[5][2];
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr};
+const int INSTRUCTION_COUNT = 19;
 
 typedef struct {
     int* destination_register;
@@ -36,6 +34,10 @@ typedef struct {
     char* destination_register_string;
 } dri_instruction_data;
 
+typedef struct {
+    int immediate_value;
+} si_instruction_data;
+
 
 typedef struct {
     int* destination_register;
@@ -44,53 +46,6 @@ typedef struct {
     
     char* destination_register_string;
 } i_instruction_data;
-
-void syscall(mips_state* state, char* parameters)
-{
-    // the length of the register should always be 3 - because
-    // $zero should never be modified
-      int printa0= state->a0;
-    switch(state->v0){
-        
-        case 1:
-            printf("Printing register a0\n");
-            printf("%d\n", printa0);
-                break;
-        case 2:
-                break; 
-        case 3:
-                break; 
-        case 4:
-                break;
-            
-        case 5:
-            
-            printf("Please enter value to store in $v0:");
-            int n;
-            scanf("%d", &n);
-            state->v0=n;
-             printf("Modified register:\n\t$v0");
-             printf(" : %d\n", state->v0);
-            break;
-            
-        case 10:
-            printf("MAI program ending. Goodbye.");
-            exit(0);
-            break;
-            
-        case 12:
-           
-            printf("Please enter a character to store in $v0:");
-            state->v0= getchar();
-            printf("Modified register:\n\t$v0:");
-            putchar(state->v0);
-            printf("\n");
-            break;
-    
-    }
- 
-   
-}
 
 // utility function for printing whichever register was modified
 void print_modified_register(mips_state* state, char* register_string)
@@ -346,6 +301,53 @@ dri_instruction_data* parse_dri_instruction(dri_instruction_data* data, mips_sta
 void help(mips_state* state, char* parameters)
 {
     printf("MIPS is a real-time MIPS interpreter.\nYou can enter MIPS assembly instruction and watch them execute one line at a time.\nFor example, try typing..\n\t>> addi $s0, $s0, 5\n\t>> add $s0, $s0, $s0\n");
+}
+
+void syscall(mips_state* state, char* parameters)
+{
+    // the length of the register should always be 3 - because
+    // $zero should never be modified
+      int printa0= state->a0;
+    switch(state->v0){
+        
+        case 1:
+            printf("Printing register a0\n");
+            printf("%d\n", printa0);
+                break;
+        case 2:
+                break; 
+        case 3:
+                break; 
+        case 4:
+                break;
+            
+        case 5:
+            
+            printf("Please enter value to store in $v0:");
+            int n;
+            scanf("%d", &n);
+            state->v0=n;
+             printf("Modified register:\n\t$v0");
+             printf(" : %d\n", state->v0);
+            break;
+            
+        case 10:
+            printf("MAI program ending. Goodbye.");
+            exit(0);
+            break;
+            
+        case 12:
+           
+            printf("Please enter a character to store in $v0:");
+            state->v0= getchar();
+            printf("Modified register:\n\t$v0:");
+            putchar(state->v0);
+            printf("\n");
+            break;
+    
+    }
+ 
+   
 }
 
 // implementation for the standard add instruction
@@ -625,4 +627,25 @@ void li(mips_state* state, char* parameters)
     
     // print modified destination
     print_modified_register(state, parse_result->destination_register_string);
+}
+
+void jr(mips_state* state, char* parameters)
+{
+    sr_instruction_data instruction_data;
+    sr_instruction_data* parse_result = parse_sr_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // set pc to register specified
+    state->pc = *parse_result->destination_register;
+    
+    printf("Modified register:\n\tpc : %d\n", state->pc);
+}
+
+void j(mips_state* state, char* parameters)
+{
+    
 }
