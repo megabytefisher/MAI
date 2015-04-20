@@ -44,7 +44,8 @@
       </toolsSet>
       <compileType>
         <cTool>
-          <commandLine>-std=gnu99</commandLine>
+          <commandlineTool>gcc</commandlineTool>
+          <commandLine>-std=gnu99 -m32</commandLine>
         </cTool>
       </compileType>
       <item path="main.c" ex="false" tool="0" flavor2="0">

@@ -384,26 +384,24 @@ void help(mips_state* state, char* parameters)
 
 void syscall(mips_state* state, char* parameters)
 {
-    // the length of the register should always be 3 - because
-    // $zero should never be modified
-      int printa0= state->a0;
+    int a0Value = state->a0;
     switch(state->v0){
-        
         case 1:
-            printf("Printing register a0\n");
-            printf("%d\n", printa0);
+            printf("%d\n", a0Value);
                 break;
         case 2:
                 break; 
         case 3:
                 break; 
         case 4:
+            //printf("gonna print string");
+                // print string from address in a0
+            printf("%s\n", (char*)a0Value);
                 break;
             
         case 5:
-            
-            printf("Please enter value to store in $v0:");
-            int n;
+            printf("");
+            int n = 0;
             scanf("%d", &n);
             state->v0=n;
              printf("Modified register:\n\t$v0");
@@ -416,8 +414,6 @@ void syscall(mips_state* state, char* parameters)
             break;
             
         case 12:
-           
-            printf("Please enter a character to store in $v0:");
             state->v0= getchar();
             printf("Modified register:\n\t$v0:");
             putchar(state->v0);
@@ -925,7 +921,7 @@ void la(mips_state* state, char* parameters)
     
     // set destination register to address of value
     *parse_result->destination_register = 
-            (parse_result->destination_register_string);
+            (int)(parse_result->immediate_value);
     
     print_modified_register(state, parse_result->destination_register_string);
 }

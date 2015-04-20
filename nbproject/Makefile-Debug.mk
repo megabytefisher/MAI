@@ -43,7 +43,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-std=gnu99
+CFLAGS=-std=gnu99 -m32
 
 # CC Compiler Flags
 CCFLAGS=
