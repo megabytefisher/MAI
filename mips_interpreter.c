@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 // saves an instruction to the text section memory
-void save_to_text(mips_state* state, char* input)
+void save_to_text(mips_state* state, char* label_name, char* input)
 {
     // increment current instruction "address" by 4
     state->instruction_counter += 4;
@@ -12,6 +12,8 @@ void save_to_text(mips_state* state, char* input)
     {
         // create a new node
         text_entry* node = malloc(sizeof(text_entry));
+        if (label_name)
+            strcpy(node->label, label_name);
         strcpy(node->instruction, input);
         node->next = 0;
         
@@ -26,6 +28,8 @@ void save_to_text(mips_state* state, char* input)
             node = node->next;
         
         node->next = malloc(sizeof(text_entry));
+        if (label_name)
+            strcpy(node->next->label, label_name);
         strcpy(node->next->instruction, input);
         node->next->next = 0;
     }
@@ -127,7 +131,38 @@ void run_from_string(mips_state* registers, char* input)
         input = skip_over_whitespace(input);
         
         // now we need to parse the non-whitespace text.
-        // if could be and opcode, label, or section specifier
+        // maybe it is specifying a .data mode change?
+        if (memcmp(input, ".data", 5) == 0)
+        {
+            read_into_data(registers);
+        }
+        
+        // we now check if there's a label
+        char* has_label = strstr(input, ":");
+        char* label_name = strtok(input, ":");
+        if (has_label)
+        {
+            input += strlen(label_name) + 1;
+            input = skip_over_whitespace(input);
+        }
+        else
+        {
+            label_name = NULL;
+        }
+        
+        // if it starts with a bang, don't save it to memory- only execute
+        int save_to_memory = 1;
+        int execute = 1;
+        if (*input == '!')
+        {
+            input++;
+            save_to_memory = 0;
+        }
+        if (*input == '?')
+        {
+            input++;
+            execute = 0;
+        }
         
         int instruction_name_length;
         instruction_function c_func = get_instruction_function(input, &instruction_name_length);
@@ -135,25 +170,23 @@ void run_from_string(mips_state* registers, char* input)
         if (c_func == 0)
         {
             // the input isn't a valid opcode
-            
-            // maybe it is specifying a .data mode change?
-            if (memcmp(input, ".data", 5) == 0)
-            {
-                read_into_data(registers);
-            }
             return;
         }
-                
-        // increment pc by 4
-        registers->pc += 4;
+        
 
         // skip over the instruction name
         char* input_args = input + instruction_name_length;
         // call that bad boy
-        c_func(registers, input_args);
+        if (execute)
+            c_func(registers, input_args);
 
         // save instruction text
-        save_to_text(registers, input);
+        if (save_to_memory)
+        {
+            // increment pc by 4
+            registers->pc += 4;
+            save_to_text(registers, label_name, input);
+        }
     }
 }
 

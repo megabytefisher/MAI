@@ -1,10 +1,11 @@
 #include "mips_instructions.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr};
-const int INSTRUCTION_COUNT = 19;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j};
+const int INSTRUCTION_COUNT = 20;
 
 typedef struct {
     int* destination_register;
@@ -46,6 +47,63 @@ typedef struct {
     
     char* destination_register_string;
 } i_instruction_data;
+
+int read_immediate(mips_state* state, char* input)
+{
+    // an immediate can either be an integer value or specify a label to read from data section
+    
+    // first let's see if its a label
+    data_entry* node = state->data_section;
+    while (node != 0)
+    {
+        // check if the input matches
+        int name_length = strlen(node->name);
+        if(memcmp(input, node->name, name_length) == 0)
+        {
+            break;
+        }
+        
+        node = node->next;
+    }
+    
+    if (node != 0)
+    {
+        // we found a matching node!
+        
+        // if it is an integer value, we just return the value of the string
+        if (strcmp(".word", node->type) == 0 || strcmp(".halfword", node->type) == 0 || strcmp(".byte", node->type) == 0)
+        {
+            int value = atoi(node->data);
+            return value;
+        }
+        // else it must be either a string or space, so we return the address
+        return (int)node->data;
+    }
+    
+    // maybe it is a label specifying an instruction address??
+    text_entry* text_node = state->text_section;
+    int text_address = 0;
+    while (text_node != 0)
+    {
+        int name_length = strlen(text_node->label);
+        if (name_length > 0)
+        {
+            if (memcmp(input, text_node->label, name_length) == 0)
+            {
+                // it's a match, return the address of the instruction!
+                return text_address;
+            }
+        }
+        
+        // keep looking
+        text_node = text_node->next;
+        // increment address by 4
+        text_address += 4;
+    }
+    
+    // so it did not match any node.. just parse it as an integer value
+    return atoi(input);
+}
 
 // utility function for printing whichever register was modified
 void print_modified_register(mips_state* state, char* register_string)
@@ -239,8 +297,8 @@ i_instruction_data* parse_i_instruction(i_instruction_data* data, mips_state* st
     
     // TODO : maybe the value is a label?
     
-    // read the value as an integer
-    int immediate_value = atoi(parameters);
+    // read the immediate
+    int immediate_value = read_immediate(state, parameters);
     
     data->destination_register = destination_register;
     data->source_register = source_register_a;
@@ -286,13 +344,34 @@ dri_instruction_data* parse_dri_instruction(dri_instruction_data* data, mips_sta
         return NULL;
     }
     
-    // TODO : maybe the value is a label?
-    
-    // read the value as an integer
-    int immediate_value = atoi(parameters);
+    // read immediate
+    int immediate_value = read_immediate(state, parameters);
     
     data->destination_register = destination_register;
     data->destination_register_string = destination_string;
+    data->immediate_value = immediate_value;
+    
+    return data;
+}
+
+si_instruction_data* parse_si_instruction(si_instruction_data* data, mips_state* state, char* parameters)
+{
+    if (data == NULL)
+        return NULL;
+    
+    // skip white space
+    parameters = skip_over_whitespace(parameters);
+    
+    // make sure this source isn't a register- it must be an immediate!
+    if (*parameters == '$')
+    {
+        printf("Error - this instruction expects an immediate value, not a register!\n");
+        return NULL;
+    }
+    
+    // read immediate
+    int immediate_value = read_immediate(state, parameters);
+    
     data->immediate_value = immediate_value;
     
     return data;
@@ -584,7 +663,7 @@ void noop(mips_state* state, char* parameters) {
 
 void mflo(mips_state* state, char* parameters) {
     sr_instruction_data instruction_data;
-    sr_instruction_data* parse_result = parse_r_instruction(&instruction_data, state, parameters);
+    sr_instruction_data* parse_result = parse_sr_instruction(&instruction_data, state, parameters);
     if (parse_result == NULL)
     {
         return;
@@ -647,5 +726,16 @@ void jr(mips_state* state, char* parameters)
 
 void j(mips_state* state, char* parameters)
 {
+    si_instruction_data instruction_data;
+    si_instruction_data* parse_result = parse_si_instruction(&instruction_data, state, parameters);
     
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // jump to immediate value
+    state->pc = parse_result->immediate_value;
+    
+    printf("Modified register:\n\tpc : %d\n", state->pc);
 }
