@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne };
-const int INSTRUCTION_COUNT = 28;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "lui", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &lui, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne };
+const int INSTRUCTION_COUNT = 29;
 
 typedef struct {
     int* destination_register;
@@ -700,9 +700,26 @@ void li(mips_state* state, char* parameters)
         return;
     }
     
-    // add sources to destination
+    // add sources to destination, but only the first 16 bits :)
     *parse_result->destination_register =
-            parse_result->immediate_value;
+            (parse_result->immediate_value & 0xFFFF);
+    
+    // print modified destination
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void lui(mips_state* state, char* parameters)
+{
+        dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    if (parse_result == NULL)
+    {
+        return;
+    }
+    
+    // add sources to destination, but only the first 16 bits :)
+    *parse_result->destination_register =
+            ((parse_result->immediate_value & 0xFFFF) << 16);
     
     // print modified destination
     print_modified_register(state, parse_result->destination_register_string);
