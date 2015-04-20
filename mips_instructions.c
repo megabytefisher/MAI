@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "lui", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &lui, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne };
-const int INSTRUCTION_COUNT = 29;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "lui", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne", "la" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &lui, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne, &la };
+const int INSTRUCTION_COUNT = 30;
 
 typedef struct {
     int* destination_register;
@@ -913,4 +913,19 @@ void bne(mips_state* state, char* parameters)
         
         printf("Modified register:\n\tpc : %d\n", state->pc);
     }
+}
+
+void la(mips_state* state, char* parameters)
+{
+    dri_instruction_data instruction_data;
+    dri_instruction_data* parse_result = parse_dri_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
+    
+    // set destination register to address of value
+    *parse_result->destination_register = 
+            (parse_result->destination_register_string);
+    
+    print_modified_register(state, parse_result->destination_register_string);
 }
