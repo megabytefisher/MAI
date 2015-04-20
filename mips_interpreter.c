@@ -88,8 +88,32 @@ void read_into_data(mips_state* state)
             p[strlen(p) - 2] = '\0';
         }
         
-        
-        printf("inputLine = '%s'\n", p);
+        // find the last node in the data section linked list
+        if (state->data_section != 0)
+        {
+            data_entry* node = state->data_section;
+            while (node->next != 0)
+                node = node->next;
+            
+            node->next = malloc(sizeof(data_entry));
+            strcpy(node->next->name, name);
+            strcpy(node->next->type, type);
+            strcpy(node->next->data, p);
+            
+            node->next->next = 0;
+        }
+        else
+        {
+            // create the first node
+            data_entry* node = malloc(sizeof(data_entry));
+            strcpy(node->name, name);
+            strcpy(node->type, type);
+            strcpy(node->data, p);
+            
+            node->next = 0;
+            
+            state->data_section = node;
+        }
     }
 }
 
