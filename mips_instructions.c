@@ -432,7 +432,9 @@ void syscall(mips_state* state, char* parameters)
             putchar(state->v0);
             printf("\n");
             break;
-    
+        default:
+            printf("Sorry, that syscall is not yet implemented!\n");
+            break;
     }
  
    
