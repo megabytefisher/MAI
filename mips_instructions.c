@@ -407,6 +407,19 @@ void syscall(mips_state* state, char* parameters)
              printf("Modified register:\n\t$v0");
              printf(" : %d\n", state->v0);
             break;
+        case 8:
+            printf("");
+            char inputLine[52];
+            char* p;
+
+            // read next input line
+            p = fgets(inputLine, sizeof(inputLine), stdin);
+            int input_length = strlen(p);
+            // put a null terminator on it, at the position of the new line character
+            p[input_length - 2] = 0;
+            
+            strcpy((char*)state->a0, p);
+            break;
             
         case 10:
             printf("MAI program ending. Goodbye.");
@@ -925,3 +938,4 @@ void la(mips_state* state, char* parameters)
     
     print_modified_register(state, parse_result->destination_register_string);
 }
+
