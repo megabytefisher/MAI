@@ -7,7 +7,7 @@
 typedef struct data_entry_ {
     char name[56];
     char type[56];
-    char data[56];
+    char* data;
     
     struct data_entry_* next;
 } data_entry;

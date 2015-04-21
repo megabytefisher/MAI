@@ -73,7 +73,19 @@ void read_into_data(mips_state* state)
             break;
         }
         
-        data_entry* node = malloc(sizeof(data_entry));
+        data_entry* node;
+        if (state->data_section == 0)
+        {
+            node = state->data_section = malloc(sizeof(data_entry));
+        }
+        else
+        {
+            while (node->next != 0)
+                node = node->next;
+            
+            node->next = malloc(sizeof(data_entry));
+            node = node->next;
+        }
         
         // name is everything before :
         char* name = strtok(p, ":");
@@ -92,32 +104,20 @@ void read_into_data(mips_state* state)
             p[strlen(p) - 2] = '\0';
         }
         
-        // find the last node in the data section linked list
-        if (state->data_section != 0)
+        if (memcmp(type, ".space", 6) == 0)
         {
-            data_entry* node = state->data_section;
-            while (node->next != 0)
-                node = node->next;
-            
-            node->next = malloc(sizeof(data_entry));
-            strcpy(node->next->name, name);
-            strcpy(node->next->type, type);
-            strcpy(node->next->data, p);
-            
-            node->next->next = 0;
+            int data_length = atoi(p);
+            printf("Making space for.. %d\n", data_length);
+            node->data = malloc(data_length);
         }
         else
         {
-            // create the first node
-            data_entry* node = malloc(sizeof(data_entry));
-            strcpy(node->name, name);
-            strcpy(node->type, type);
+            int data_length = strlen(p);
+            node->data = malloc(data_length);
             strcpy(node->data, p);
-            
-            node->next = 0;
-            
-            state->data_section = node;
         }
+        
+        node->next = 0;
     }
 }
 
