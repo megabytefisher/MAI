@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "lui", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne", "la", "sw", "lw" };
-const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &lui, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne, &la, &sw, &lw };
-const int INSTRUCTION_COUNT = 32;
+const char* INSTRUCTION_NAMES[] = {"syscall", "help", "add", "addi", "and", "andi","sub","or", "ori" , "xor", "sllv", "slrv", "div", "mult", "noop", "mflo", "mfhi", "li", "lui", "jr", "j", "beq", "bgez", "bgezal", "bgtz", "blez", "bltz", "bltzal", "bne", "la", "sw", "lw", "view" };
+const instruction_function INSTRUCTION_IMPLEMENTATION[] = {&syscall, &help, &add, &addi, &and, &andi, &sub, &or, &ori, &xor, &sllv, &slrv, &divi, &mult, &noop, &mflo, &mfhi, &li, &lui, &jr, &j, &beq, &bgez, &bgezal, &bgtz, &blez, &bltz, &bltzal, &bne, &la, &sw, &lw, &view };
+const int INSTRUCTION_COUNT = 33;
 
 typedef struct {
     int* destination_register;
@@ -967,6 +967,17 @@ void lw(mips_state* state, char* parameters)
     // write the value at that address to the register
     *parse_result->destination_register =
             *((int*)parse_result->immediate_value);
+    
+    print_modified_register(state, parse_result->destination_register_string);
+}
+
+void view(mips_state* state, char* parameters)
+{
+    sr_instruction_data instruction_data;
+    sr_instruction_data* parse_result = parse_sr_instruction(&instruction_data, state, parameters);
+    
+    if (parse_result == NULL)
+        return;
     
     print_modified_register(state, parse_result->destination_register_string);
 }

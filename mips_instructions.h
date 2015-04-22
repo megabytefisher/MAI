@@ -40,6 +40,7 @@ void lui(mips_state* state, char* parameters);
 void la(mips_state* state, char* parameters);
 void sw(mips_state* state, char* parameters);
 void lw(mips_state* state, char* parameters);
+void view(mips_state* state, char* parameters);
 
 // pseudo-dictionary for going from char* -> function pointer
 extern const char* INSTRUCTION_NAMES[];
