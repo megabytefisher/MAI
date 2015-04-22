@@ -107,7 +107,6 @@ void read_into_data(mips_state* state)
         if (memcmp(type, ".space", 6) == 0)
         {
             int data_length = atoi(p);
-            printf("Making space for.. %d\n", data_length);
             node->data = malloc(data_length);
         }
         else

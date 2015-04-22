@@ -416,7 +416,7 @@ void syscall(mips_state* state, char* parameters)
             p = fgets(inputLine, sizeof(inputLine), stdin);
             int input_length = strlen(p);
             // put a null terminator on it, at the position of the new line character
-            p[input_length - 2] = 0;
+            p[input_length - 1] = 0;
             
             strcpy((char*)state->a0, p);
             break;
